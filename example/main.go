@@ -42,7 +42,7 @@ func main() {
 		interfacePoints[i] = d
 	}
 
-	km := kmeans.LloydsAlgo(euclideanDist, updateCluster)
+	km := kmeans.Km(euclideanDist, updateCluster)
 	clusterCenters, clusterMembers, _ := km(interfacePoints, 2, 10)
 	for i := 0; i < len(clusterCenters); i++ {
 		fmt.Printf("Cluster Center %v:\n", clusterCenters[i].(Point))

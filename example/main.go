@@ -20,7 +20,7 @@ func euclideanDist(P1, P2 interface{}) float64 {
 	return math.Sqrt(math.Pow(p1.x-p2.x, 2) + math.Pow(p1.y-p2.y, 2))
 }
 
-func updateCluster(c kmeans.Cluster) interface{} {
+func updateCluster(c gocluster.Cluster) interface{} {
 	tot := Point{0., 0.}
 	for i := 0; i < len(c.Entity); i++ {
 		tmp := c.Entity[i].(Point)
@@ -43,7 +43,7 @@ func main() {
 	}
 
 	// Solve with standard k-means
-	km := kmeans.Km(euclideanDist, updateCluster)
+	km := gocluster.Km(euclideanDist, updateCluster)
 	clusterCenters, clusterMembers, _ := km(interfacePoints, 2, 10)
 	for i := 0; i < len(clusterCenters); i++ {
 		fmt.Printf("Cluster Center %v:\n", clusterCenters[i].(Point))
@@ -51,7 +51,7 @@ func main() {
 	}
 
 	// Solve with k-means++
-	km = kmeans.Kmpp(euclideanDist, updateCluster)
+	km = gocluster.Kmpp(euclideanDist, updateCluster)
 	clusterCenters, clusterMembers, _ = km(interfacePoints, 2, 10)
 	for i := 0; i < len(clusterCenters); i++ {
 		fmt.Printf("Cluster Center %v:\n", clusterCenters[i].(Point))

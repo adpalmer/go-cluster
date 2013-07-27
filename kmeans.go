@@ -3,7 +3,6 @@ package kmeans
 import (
 	"math"
 	"math/rand"
-	"time"
 )
 
 type Cluster struct {
@@ -17,10 +16,9 @@ func Km(calcDist func(p1, p2 interface{}) float64, updateClust func(Cluster) int
 		numEntities := len(entities)
 
 		// initialize entities
-		r := rand.New(rand.NewSource(time.Now().Unix()))
 		centers := make([]interface{}, k)
 		for i := 0; i < k; i++ {
-			centers[i] = entities[r.Intn(numEntities)]
+			centers[i] = entities[rand.Intn(numEntities)]
 		}
 		return lloydsAlgo(entities, centers, maxIters, calcDist, updateClust)
 	}
@@ -43,14 +41,7 @@ func lloydsAlgo(entities, centers []interface{}, maxIters int, calcDist func(p1,
 		curVariance := 0. // current variance
 		for j := 0; j < numEntities; j++ {
 			// get best cluster for each point
-			minDist, minPt := math.MaxFloat64, 0
-			for l, val := range centers {
-				dist := calcDist(entities[j], val)
-
-				if dist < minDist {
-					minDist, minPt = dist, l
-				}
-			}
+			minPt, minDist := nearest(entities[j], centers, calcDist)
 			clusters[minPt].Entity = append(clusters[minPt].Entity, entities[j])
 			curVariance += minDist
 		}
@@ -67,4 +58,16 @@ func lloydsAlgo(entities, centers []interface{}, maxIters int, calcDist func(p1,
 
 	}
 	return centers, clusters, nil
+}
+
+// fine nearest center to given point
+func nearest(val interface{}, centers []interface{}, calcDist func(p1, p2 interface{}) float64) (int, float64) {
+	minDist, minPt := math.MaxFloat64, 0
+	for l, center := range centers {
+		dist := calcDist(val, center)
+		if dist < minDist {
+			minDist, minPt = dist, l
+		}
+	}
+	return minPt, minDist
 }

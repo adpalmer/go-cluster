@@ -24,6 +24,34 @@ func Km(calcDist func(p1, p2 interface{}) float64, updateClust func(Cluster) int
 	}
 }
 
+func Kmpp(calcDist func(p1, p2 interface{}) float64, updateClust func(Cluster) interface{}) func([]interface{}, int, int) ([]interface{}, []Cluster, error) {
+	return func(entities []interface{}, k, maxIters int) ([]interface{}, []Cluster, error) {
+		numEntities := len(entities)
+		centers := make([]interface{}, k)
+		d2 := make([]float64, numEntities) // distance squared
+		centers[0] = entities[rand.Intn(numEntities)]
+
+		// iterate through rest of k to initialize other centers
+		for i := 1; i < k; i++ {
+			sum := 0.0
+			for j, data := range entities {
+				_, minDist := nearest(data, centers[:i], calcDist)
+				d2[j] = minDist * minDist
+				sum += d2[j]
+			}
+
+			// use find random number less than sum then iterate through d2 until index is found
+			target := rand.Float64() * sum
+			j := 0
+			for sum = d2[0]; sum < target; sum += d2[j] {
+				j++
+			}
+			centers[i] = entities[j]
+		}
+		return lloydsAlgo(entities, centers, maxIters, calcDist, updateClust)
+	}
+}
+
 // Lloye's Algorithm for calculating k-means clustering
 // called from Km
 func lloydsAlgo(entities, centers []interface{}, maxIters int, calcDist func(p1, p2 interface{}) float64, updateClust func(Cluster) interface{}) ([]interface{}, []Cluster, error) {

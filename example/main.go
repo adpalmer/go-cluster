@@ -42,10 +42,20 @@ func main() {
 		interfacePoints[i] = d
 	}
 
+	// Solve with standard k-means
 	km := kmeans.Km(euclideanDist, updateCluster)
 	clusterCenters, clusterMembers, _ := km(interfacePoints, 2, 10)
 	for i := 0; i < len(clusterCenters); i++ {
 		fmt.Printf("Cluster Center %v:\n", clusterCenters[i].(Point))
 		fmt.Println("\tmembers -> ", clusterMembers[i].Entity)
 	}
+
+	// Solve with k-means++
+	km = kmeans.Kmpp(euclideanDist, updateCluster)
+	clusterCenters, clusterMembers, _ = km(interfacePoints, 2, 10)
+	for i := 0; i < len(clusterCenters); i++ {
+		fmt.Printf("Cluster Center %v:\n", clusterCenters[i].(Point))
+		fmt.Println("\tmembers -> ", clusterMembers[i].Entity)
+	}
+
 }

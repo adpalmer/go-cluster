@@ -30,8 +30,8 @@ func Kmpp(calcDist func(p1, p2 interface{}) float64, updateClust func([]interfac
 		// iterate through rest of k to initialize other centers
 		for i := 1; i < k; i++ {
 			sum := 0.0
-			for j, data := range entities {
-				_, minDist := nearest(data, centers[:i], calcDist)
+			for j := range entities {
+				_, minDist := nearest(entities[j], centers[:i], calcDist)
 				d2[j] = minDist * minDist
 				sum += d2[j]
 			}
@@ -87,8 +87,8 @@ func lloydsAlgo(entities, centers []interface{}, maxIters int, calcDist func(p1,
 // fine nearest center to given point
 func nearest(val interface{}, centers []interface{}, calcDist func(p1, p2 interface{}) float64) (int, float64) {
 	minDist, minPt := math.MaxFloat64, 0
-	for l, center := range centers {
-		dist := calcDist(val, center)
+	for l := range centers {
+		dist := calcDist(val, centers[l])
 		if dist < minDist {
 			minDist, minPt = dist, l
 		}

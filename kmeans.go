@@ -5,14 +5,10 @@ import (
 	"math/rand"
 )
 
-type Cluster struct {
-	Entity []interface{}
-}
-
 // Function to randomly initialize clusters from input dataset.
 // After initializing k clusters, runs Lloyd's Algorithm to find clusters
-func Km(calcDist func(p1, p2 interface{}) float64, updateClust func(Cluster) interface{}) func([]interface{}, int, int) ([]interface{}, []Cluster, error) {
-	return func(entities []interface{}, k, maxIters int) ([]interface{}, []Cluster, error) {
+func Km(calcDist func(p1, p2 interface{}) float64, updateClust func([]interface{}) interface{}) func([]interface{}, int, int) ([]interface{}, [][]interface{}, error) {
+	return func(entities []interface{}, k, maxIters int) ([]interface{}, [][]interface{}, error) {
 		numEntities := len(entities)
 
 		// initialize entities
@@ -24,8 +20,8 @@ func Km(calcDist func(p1, p2 interface{}) float64, updateClust func(Cluster) int
 	}
 }
 
-func Kmpp(calcDist func(p1, p2 interface{}) float64, updateClust func(Cluster) interface{}) func([]interface{}, int, int) ([]interface{}, []Cluster, error) {
-	return func(entities []interface{}, k, maxIters int) ([]interface{}, []Cluster, error) {
+func Kmpp(calcDist func(p1, p2 interface{}) float64, updateClust func([]interface{}) interface{}) func([]interface{}, int, int) ([]interface{}, [][]interface{}, error) {
+	return func(entities []interface{}, k, maxIters int) ([]interface{}, [][]interface{}, error) {
 		numEntities := len(entities)
 		centers := make([]interface{}, k)
 		d2 := make([]float64, numEntities) // distance squared
@@ -54,23 +50,23 @@ func Kmpp(calcDist func(p1, p2 interface{}) float64, updateClust func(Cluster) i
 
 // Lloye's Algorithm for calculating k-means clustering
 // called from Km
-func lloydsAlgo(entities, centers []interface{}, maxIters int, calcDist func(p1, p2 interface{}) float64, updateClust func(Cluster) interface{}) ([]interface{}, []Cluster, error) {
+func lloydsAlgo(entities, centers []interface{}, maxIters int, calcDist func(p1, p2 interface{}) float64, updateClust func([]interface{}) interface{}) ([]interface{}, [][]interface{}, error) {
 	numEntities := len(entities)
 
 	// setup cluster groups
-	clusters := make([]Cluster, len(centers))
+	clusters := make([][]interface{}, len(centers))
 	prevVariance := math.MaxFloat64
 
 	for i := 0; i < maxIters; i++ {
 		// setup clusters
 		for i := range centers {
-			clusters[i].Entity = make([]interface{}, 0, 10)
+			clusters[i] = make([]interface{}, 0, 10)
 		}
 		curVariance := 0. // current variance
 		for j := 0; j < numEntities; j++ {
 			// get best cluster for each point
 			minPt, minDist := nearest(entities[j], centers, calcDist)
-			clusters[minPt].Entity = append(clusters[minPt].Entity, entities[j])
+			clusters[minPt] = append(clusters[minPt], entities[j])
 			curVariance += minDist
 		}
 

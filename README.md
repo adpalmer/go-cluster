@@ -1,4 +1,4 @@
 go-cluster
 ==========
 
-K-Means clustering using Lloyd's Algorithm
+K-means and k-means++ clustering using Lloyd's Algorithm

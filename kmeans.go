@@ -3,18 +3,21 @@ package gocluster
 import (
 	"math"
 	"math/rand"
+	"time"
 )
 
 // Function to randomly initialize clusters from input dataset.
 // After initializing k clusters, runs Lloyd's Algorithm to find clusters
 func Km(calcDist func(p1, p2 interface{}) float64, updateClust func([]interface{}) interface{}) func([]interface{}, int, int) ([]interface{}, [][]interface{}, error) {
 	return func(entities []interface{}, k, maxIters int) ([]interface{}, [][]interface{}, error) {
+		// create new random generator to avoid using the shared global object's Mutex lock
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
 		numEntities := len(entities)
 
 		// initialize entities
 		centers := make([]interface{}, k)
 		for i := 0; i < k; i++ {
-			centers[i] = entities[rand.Intn(numEntities)]
+			centers[i] = entities[r.Intn(numEntities)]
 		}
 		return lloydsAlgo(entities, centers, maxIters, calcDist, updateClust)
 	}
@@ -22,10 +25,12 @@ func Km(calcDist func(p1, p2 interface{}) float64, updateClust func([]interface{
 
 func Kmpp(calcDist func(p1, p2 interface{}) float64, updateClust func([]interface{}) interface{}) func([]interface{}, int, int) ([]interface{}, [][]interface{}, error) {
 	return func(entities []interface{}, k, maxIters int) ([]interface{}, [][]interface{}, error) {
+		// create new random generator to avoid using the shared global object's Mutex lock
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
 		numEntities := len(entities)
 		centers := make([]interface{}, k)
 		d2 := make([]float64, numEntities) // distance squared
-		centers[0] = entities[rand.Intn(numEntities)]
+		centers[0] = entities[r.Intn(numEntities)]
 
 		// iterate through rest of k to initialize other centers
 		for i := 1; i < k; i++ {
@@ -37,7 +42,7 @@ func Kmpp(calcDist func(p1, p2 interface{}) float64, updateClust func([]interfac
 			}
 
 			// use find random number less than sum then iterate through d2 until index is found
-			target := rand.Float64() * sum
+			target := r.Float64() * sum
 			j := 0
 			for sum = d2[0]; sum < target; sum += d2[j] {
 				j++

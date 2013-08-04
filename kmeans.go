@@ -62,11 +62,17 @@ func lloydsAlgo(entities, centers []interface{}, maxIters int, calcDist func(p1,
 	clusters := make([][]interface{}, len(centers))
 	prevVariance := math.MaxFloat64
 
+	// setup clusters
+	for i := range centers {
+		clusters[i] = make([]interface{}, 0, 10)
+	}
+
 	for i := 0; i < maxIters; i++ {
-		// setup clusters
+		// reset slices to zero
 		for i := range centers {
-			clusters[i] = make([]interface{}, 0, 10)
+			clusters[i] = clusters[i][:0]
 		}
+
 		curVariance := 0. // current variance
 		for j := 0; j < numEntities; j++ {
 			// get best cluster for each point

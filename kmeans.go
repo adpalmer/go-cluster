@@ -1,8 +1,3 @@
-/* NOTES: Needs to be optimized. Shouldn't be constantly moving around arrays.
- *        should instead be swapping pointers to those lists. That will be
- *        in next version.
- */
-
 package gocluster
 
 import (
